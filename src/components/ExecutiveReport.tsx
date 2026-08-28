@@ -35,50 +35,61 @@ export const ExecutiveReport: React.FC<ExecutiveReportProps> = ({ result }) => {
   return (
     <div className="w-full max-w-6xl mx-auto space-y-6">
       {/* Top Toolbar */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-4 rounded-2xl bg-slate-900 border border-slate-800">
+      <div
+        role="toolbar"
+        aria-label="Report Export and Printing Actions"
+        className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-4 rounded-2xl bg-slate-900 border border-slate-800"
+      >
         <div className="flex items-center gap-2">
-          <FileText className="w-5 h-5 text-indigo-400" />
+          <FileText className="w-5 h-5 text-indigo-400" aria-hidden="true" />
           <span className="text-sm font-bold text-white">Official Jury Decision Packet</span>
         </div>
 
         <div className="flex items-center gap-2 flex-wrap">
           <button
             onClick={handleCopyMarkdown}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-xs font-semibold text-slate-200 transition-colors"
+            aria-label={copied ? "Markdown copied to clipboard" : "Copy decision report as Markdown"}
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-xs font-semibold text-slate-200 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-400 cursor-pointer"
           >
-            {copied ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
+            {copied ? <Check className="w-3.5 h-3.5 text-emerald-400" aria-hidden="true" /> : <Copy className="w-3.5 h-3.5" aria-hidden="true" />}
             <span>{copied ? "Copied Markdown!" : "Copy Markdown"}</span>
           </button>
 
           <button
             onClick={handleDownloadJson}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-xs font-semibold text-slate-200 transition-colors"
+            aria-label="Download full analysis results JSON"
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-xs font-semibold text-slate-200 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-400 cursor-pointer"
           >
-            <Download className="w-3.5 h-3.5" />
+            <Download className="w-3.5 h-3.5" aria-hidden="true" />
             <span>Export JSON</span>
           </button>
 
           <button
             onClick={handlePrint}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-xs font-semibold text-white transition-colors"
+            aria-label="Print candidate evaluation report"
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-xs font-semibold text-white transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-400 cursor-pointer"
           >
-            <Printer className="w-3.5 h-3.5" />
+            <Printer className="w-3.5 h-3.5" aria-hidden="true" />
             <span>Print Report</span>
           </button>
         </div>
       </div>
 
       {/* Printable Report Document Card */}
-      <div id="printable-report" className="rounded-3xl bg-slate-900/95 border border-slate-800 p-8 sm:p-12 space-y-8 text-slate-200 shadow-2xl">
+      <article
+        id="printable-report"
+        aria-label="Formal Candidate Evaluation Record"
+        className="rounded-3xl bg-slate-900/95 border border-slate-800 p-8 sm:p-12 space-y-8 text-slate-200 shadow-2xl"
+      >
         {/* Document Header */}
         <div className="border-b border-slate-800 pb-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
             <div className="text-xs uppercase font-bold text-indigo-400 tracking-wider">
               AI Hiring Jury • Formal Evaluation Record
             </div>
-            <h1 className="text-2xl sm:text-3xl font-extrabold text-white mt-1">
+            <h2 className="text-2xl sm:text-3xl font-extrabold text-white mt-1">
               Candidate: {profile.name}
-            </h1>
+            </h2>
             <p className="text-xs text-slate-400 mt-0.5">
               Role: {profile.targetRole} • Date: {new Date().toLocaleDateString()}
             </p>
@@ -92,152 +103,132 @@ export const ExecutiveReport: React.FC<ExecutiveReportProps> = ({ result }) => {
         </div>
 
         {/* Section 1: Executive Summary */}
-        <div className="space-y-2">
-          <h2 className="text-xs font-bold uppercase tracking-wider text-slate-400">1. Executive Summary & Verdict</h2>
+        <section aria-labelledby="section-summary-heading" className="space-y-2">
+          <h3 id="section-summary-heading" className="text-xs font-bold uppercase tracking-wider text-slate-400">
+            1. Executive Summary & Verdict
+          </h3>
           <p className="text-sm text-slate-300 leading-relaxed bg-slate-950/40 p-4 rounded-xl border border-slate-800/80">
             {decision.executiveReasoning}
           </p>
-        </div>
+        </section>
 
-        {/* Section 2: Four Independent Perspectives */}
-        <div className="space-y-3">
-          <h2 className="text-xs font-bold uppercase tracking-wider text-slate-400">2. Independent Persona Opinions</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="p-4 rounded-xl bg-slate-950/50 border border-slate-800 space-y-2">
-              <div className="flex items-center justify-between">
-                <span className="font-bold text-sky-400 text-xs">🧑‍💻 Technical ({agents.technical.agentName})</span>
-                <span className="text-[10px] px-2 py-0.5 rounded bg-sky-950 text-sky-300">{agents.technical.recommendation} ({agents.technical.confidenceScore}%)</span>
+        {/* Section 2: Four Independent Agent Findings */}
+        <section aria-labelledby="section-agents-heading" className="space-y-4">
+          <h3 id="section-agents-heading" className="text-xs font-bold uppercase tracking-wider text-slate-400">
+            2. Four Independent Persona Findings (Isolated Pre-Debate Stage)
+          </h3>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            {[agents.technical, agents.hr, agents.hiringManager, agents.skeptic].map((agent) => (
+              <div key={agent.agentRole} className="p-4 rounded-xl bg-slate-950/50 border border-slate-800 space-y-2">
+                <div className="flex items-center justify-between">
+                  <div className="font-bold text-sm text-white">
+                    {agent.avatar} {agent.agentName}
+                  </div>
+                  <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-slate-800 text-indigo-300">
+                    {agent.recommendation} ({agent.confidenceScore}%)
+                  </span>
+                </div>
+                <p className="text-xs text-slate-300 line-clamp-3">{agent.overallAssessment}</p>
+                <div className="text-[10px] text-slate-500 font-mono">
+                  Isolation Call ID: {agent.isolatedExecutionProof.callId}
+                </div>
               </div>
-              <p className="text-xs text-slate-300">{agents.technical.overallAssessment}</p>
-            </div>
-
-            <div className="p-4 rounded-xl bg-slate-950/50 border border-slate-800 space-y-2">
-              <div className="flex items-center justify-between">
-                <span className="font-bold text-purple-400 text-xs">🤝 HR / Culture ({agents.hr.agentName})</span>
-                <span className="text-[10px] px-2 py-0.5 rounded bg-purple-950 text-purple-300">{agents.hr.recommendation} ({agents.hr.confidenceScore}%)</span>
-              </div>
-              <p className="text-xs text-slate-300">{agents.hr.overallAssessment}</p>
-            </div>
-
-            <div className="p-4 rounded-xl bg-slate-950/50 border border-slate-800 space-y-2">
-              <div className="flex items-center justify-between">
-                <span className="font-bold text-emerald-400 text-xs">👔 Hiring Manager ({agents.hiringManager.agentName})</span>
-                <span className="text-[10px] px-2 py-0.5 rounded bg-emerald-950 text-emerald-300">{agents.hiringManager.recommendation} ({agents.hiringManager.confidenceScore}%)</span>
-              </div>
-              <p className="text-xs text-slate-300">{agents.hiringManager.overallAssessment}</p>
-            </div>
-
-            <div className="p-4 rounded-xl bg-slate-950/50 border border-slate-800 space-y-2">
-              <div className="flex items-center justify-between">
-                <span className="font-bold text-amber-400 text-xs">🕵️ Skeptic Auditor ({agents.skeptic.agentName})</span>
-                <span className="text-[10px] px-2 py-0.5 rounded bg-amber-950 text-amber-300">{agents.skeptic.recommendation} ({agents.skeptic.confidenceScore}%)</span>
-              </div>
-              <p className="text-xs text-slate-300">{agents.skeptic.overallAssessment}</p>
-            </div>
+            ))}
           </div>
-        </div>
+        </section>
 
         {/* Section 3: Debate Highlights & Position Changes */}
-        <div className="space-y-3">
-          <h2 className="text-xs font-bold uppercase tracking-wider text-slate-400">3. Debate Record & Stance Updates</h2>
-          <div className="p-4 rounded-xl bg-slate-950/50 border border-slate-800 space-y-3 text-xs">
-            <div className="font-semibold text-slate-300">Debate Topic: {debate.topicOfDebate}</div>
-            <div className="space-y-2">
-              {debate.concessionsMade.map((conc, idx) => (
-                <div key={idx} className="p-2.5 rounded-lg bg-amber-950/20 border border-amber-900/40 text-[11px] space-y-1">
-                  <div className="font-bold text-amber-300 capitalize">{conc.agent} Agent Reconciled Position:</div>
-                  <div className="text-slate-400 line-through">Prior: {conc.priorPosition}</div>
-                  <div className="text-emerald-300">Revised: {conc.revisedPosition}</div>
-                  <div className="text-slate-400 italic">Reason: {conc.reason}</div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-
-        {/* Section 4: Key Evidence Matrix */}
-        <div className="space-y-3">
-          <h2 className="text-xs font-bold uppercase tracking-wider text-slate-400">4. Key Evidence-Backed Findings</h2>
-          <div className="space-y-2">
-            {decision.keyStrengths.map((str, idx) => (
-              <div key={idx} className="p-3 rounded-lg bg-slate-950/40 border border-slate-800 text-xs space-y-1">
-                <div className="font-bold text-emerald-400">✓ {str.title}</div>
-                <p className="text-slate-300 text-[11px]">{str.description}</p>
-                <div className="flex items-center gap-2 pt-0.5">
-                  <SourceBadge source={str.primaryEvidence.source} location={str.primaryEvidence.location} />
-                  <span className="text-[10px] text-slate-400 italic">&ldquo;{str.primaryEvidence.quote}&rdquo;</span>
-                </div>
+        <section aria-labelledby="section-debate-heading" className="space-y-3">
+          <h3 id="section-debate-heading" className="text-xs font-bold uppercase tracking-wider text-slate-400">
+            3. Multi-Agent Debate Highlights & Position Changes
+          </h3>
+          <div className="p-4 rounded-xl bg-slate-950/50 border border-slate-800 space-y-2 text-xs">
+            <p className="text-slate-300">
+              <strong>Core Debate Subject:</strong> {debate.topicOfDebate}
+            </p>
+            {debate.concessionsMade.length > 0 ? (
+              <div className="space-y-1.5 pt-2">
+                <div className="text-[11px] font-bold text-amber-300">Concessions Made During Debate:</div>
+                {debate.concessionsMade.map((c, idx) => (
+                  <div key={idx} className="p-2 rounded bg-amber-950/20 border border-amber-800/40 text-slate-300 text-[11px]">
+                    <strong>{c.agent}:</strong> {c.reason}
+                  </div>
+                ))}
               </div>
-            ))}
+            ) : (
+              <p className="text-slate-400">All 4 personas maintained alignment through multi-round cross-examination.</p>
+            )}
           </div>
-        </div>
+        </section>
 
-        {/* Section 5: Targeted Next Round Probes */}
-        <div className="space-y-3">
-          <h2 className="text-xs font-bold uppercase tracking-wider text-slate-400">5. Recommended Follow-Up Action Plan</h2>
+        {/* Section 4: Recommended Next-Round Probes */}
+        <section aria-labelledby="section-probes-heading" className="space-y-3">
+          <h3 id="section-probes-heading" className="text-xs font-bold uppercase tracking-wider text-slate-400">
+            4. Recommended Next-Round Interview Deep-Dives
+          </h3>
           <div className="space-y-2">
             {decision.targetedNextRoundProbes.map((probe, idx) => (
-              <div key={idx} className="p-3 rounded-lg bg-slate-950/40 border border-slate-800 text-xs space-y-1">
-                <div className="font-bold text-indigo-300">{idx + 1}. {probe.area}</div>
-                <div className="font-mono text-[11px] text-slate-300">&ldquo;{probe.suggestedQuestion}&rdquo;</div>
-                <div className="text-[10px] text-slate-400">Focus: {probe.whatToLookFor}</div>
+              <div key={idx} className="p-3.5 rounded-xl bg-slate-950/60 border border-slate-800 text-xs space-y-1">
+                <div className="font-bold text-indigo-300">Probe #{idx + 1}: {probe.area}</div>
+                <div className="font-mono text-slate-200">&ldquo;{probe.suggestedQuestion}&rdquo;</div>
+                <div className="text-[11px] text-slate-400">Look for: {probe.whatToLookFor}</div>
               </div>
             ))}
           </div>
-        </div>
-      </div>
+        </section>
+      </article>
     </div>
   );
 };
 
 function generateMarkdownReport(result: FullAnalysisResult): string {
-  const { candidateProfile: p, independentEvaluations: a, debate: d, finalDecision: f } = result;
+  const { candidateProfile: profile, independentEvaluations: agents, debate, finalDecision: decision } = result;
 
-  return `# AI HIRING JURY — OFFICIAL REPORT
-**Candidate:** ${p.name}
-**Target Role:** ${p.targetRole}
-**Date:** ${new Date().toISOString()}
-
----
-
-## 1. JURY VERDICT
-- **Recommendation:** ${f.recommendation}
-- **Confidence Score:** ${f.confidenceScore}% (Evidence-Weighted, Non-Averaged)
-- **Executive Rationale:**
-${f.executiveReasoning}
+  return `# AI Hiring Jury — Evaluation Packet
+**Candidate**: ${profile.name}
+**Target Role**: ${profile.targetRole}
+**Date**: ${new Date().toISOString()}
 
 ---
 
-## 2. INDEPENDENT PERSONA OPINIONS (Isolated Stage 2 Calls)
-- **Technical Agent (${a.technical.agentName}):** ${a.technical.recommendation} (${a.technical.confidenceScore}%)
-  - *Assessment:* ${a.technical.overallAssessment}
-- **HR / Culture Agent (${a.hr.agentName}):** ${a.hr.recommendation} (${a.hr.confidenceScore}%)
-  - *Assessment:* ${a.hr.overallAssessment}
-- **Hiring Manager (${a.hiringManager.agentName}):** ${a.hiringManager.recommendation} (${a.hiringManager.confidenceScore}%)
-  - *Assessment:* ${a.hiringManager.overallAssessment}
-- **Skeptic Auditor (${a.skeptic.agentName}):** ${a.skeptic.recommendation} (${a.skeptic.confidenceScore}%)
-  - *Assessment:* ${a.skeptic.overallAssessment}
+## Final Binding Recommendation
+- **Verdict**: ${decision.recommendation}
+- **Evidence-Weighted Confidence**: ${decision.confidenceScore}%
+- **Executive Rationale**: ${decision.executiveReasoning}
 
 ---
 
-## 3. DEBATE RECORD & CONCESSIONS
-**Debate Subject:** ${d.topicOfDebate}
-
-${d.concessionsMade.map((c) => `- **${c.agent} concession:** Revised stance from "${c.priorPosition}" to "${c.revisedPosition}" because ${c.reason}`).join("\n")}
-
----
-
-## 4. PRIMARY EVIDENCE-BACKED FINDINGS
-${f.keyStrengths.map((s) => `### Strengths: ${s.title}\n- ${s.description}\n- *Evidence:* "${s.primaryEvidence.quote}" (${s.primaryEvidence.source})`).join("\n\n")}
-
-${f.keyRisks.map((r) => `### Risk (${r.severity}): ${r.title}\n- ${r.description}\n- *Impact:* ${r.impactIfHired}\n- *Evidence:* "${r.primaryEvidence.quote}" (${r.primaryEvidence.source})`).join("\n\n")}
+## Independent Persona Findings (Pre-Debate Stage)
+- **Technical Lead (${agents.technical.agentName})**: ${agents.technical.recommendation} (${agents.technical.confidenceScore}%)
+  - ${agents.technical.overallAssessment}
+- **HR & Culture Lead (${agents.hr.agentName})**: ${agents.hr.recommendation} (${agents.hr.confidenceScore}%)
+  - ${agents.hr.overallAssessment}
+- **Hiring Manager (${agents.hiringManager.agentName})**: ${agents.hiringManager.recommendation} (${agents.hiringManager.confidenceScore}%)
+  - ${agents.hiringManager.overallAssessment}
+- **Adversarial Skeptic (${agents.skeptic.agentName})**: ${agents.skeptic.recommendation} (${agents.skeptic.confidenceScore}%)
+  - ${agents.skeptic.overallAssessment}
 
 ---
 
-## 5. RECOMMENDED NEXT-ROUND PROBES
-${f.targetedNextRoundProbes.map((pr, i) => `${i + 1}. **${pr.area}**: "${pr.suggestedQuestion}"\n   - *What to look for:* ${pr.whatToLookFor}`).join("\n")}
+## Multi-Agent Debate Summary
+- **Topic**: ${debate.topicOfDebate}
+- **Interactive Rounds**: ${debate.rounds.length}
+- **Consensus Points**:
+${debate.consensusPoints.map((cp) => `  - ${cp}`).join("\n")}
+- **Unresolved Disagreements**:
+${debate.unresolvedDisagreements.map((ud) => `  - ${ud}`).join("\n")}
 
 ---
-*Generated by AI Hiring Jury — 4 Independent Personas, Evidence-Backed Debate, Reasoned Judgment.*
+
+## Recommended Next-Round Probes
+${decision.targetedNextRoundProbes
+  .map(
+    (p, i) =>
+      `### ${i + 1}. ${p.area}\n- **Question**: "${p.suggestedQuestion}"\n- **What to look for**: ${p.whatToLookFor}\n- **Reason**: ${p.reasonForProbe}`
+  )
+  .join("\n\n")}
+
+---
+*Generated by AI Hiring Jury — Multi-Agent Evidence-Backed Evaluation System*
 `;
 }

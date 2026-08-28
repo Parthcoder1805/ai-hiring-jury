@@ -17,11 +17,18 @@ export const Navbar: React.FC<NavbarProps> = ({
   isLoading,
 }) => {
   return (
-    <header className="sticky top-0 z-40 w-full border-b border-slate-800 bg-slate-950/80 backdrop-blur-md">
+    <header
+      role="banner"
+      aria-label="Main Navigation Header"
+      className="sticky top-0 z-40 w-full border-b border-slate-800 bg-slate-950/80 backdrop-blur-md"
+    >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
         {/* Brand */}
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-blue-600 via-indigo-600 to-purple-600 flex items-center justify-center shadow-lg shadow-indigo-500/20">
+          <div
+            className="w-10 h-10 rounded-xl bg-gradient-to-tr from-blue-600 via-indigo-600 to-purple-600 flex items-center justify-center shadow-lg shadow-indigo-500/20"
+            aria-hidden="true"
+          >
             <Scale className="w-5 h-5 text-white" />
           </div>
           <div>
@@ -40,8 +47,12 @@ export const Navbar: React.FC<NavbarProps> = ({
         {/* Right side controls */}
         <div className="flex items-center gap-3">
           {/* Provider Badge */}
-          <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-900 border border-slate-800 text-xs text-slate-300">
-            <Cpu className="w-3.5 h-3.5 text-indigo-400" />
+          <div
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-900 border border-slate-800 text-xs text-slate-300"
+            role="status"
+            aria-label={`Active LLM Engine: ${providerName}${isDemoSimulation ? " (Demo Mode)" : ""}`}
+          >
+            <Cpu className="w-3.5 h-3.5 text-indigo-400" aria-hidden="true" />
             <span className="hidden md:inline text-slate-400">Engine:</span>
             <span className="font-medium text-slate-200">{providerName}</span>
             {isDemoSimulation && (
@@ -55,9 +66,10 @@ export const Navbar: React.FC<NavbarProps> = ({
           <button
             onClick={onSelectDemo}
             disabled={isLoading}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white shadow-md shadow-indigo-600/20 transition-all disabled:opacity-50"
+            aria-label="Try Sample Demo Candidate: Arjun Mehta (Senior Backend Engineer)"
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white shadow-md shadow-indigo-600/20 transition-all disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-400 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950 cursor-pointer"
           >
-            <Sparkles className="w-3.5 h-3.5" />
+            <Sparkles className="w-3.5 h-3.5" aria-hidden="true" />
             <span>Try Demo Candidate</span>
           </button>
 
@@ -65,10 +77,11 @@ export const Navbar: React.FC<NavbarProps> = ({
           <button
             onClick={onReset}
             disabled={isLoading}
+            aria-label="Reset evaluation and clear candidate materials"
             title="Reset to fresh candidate upload"
-            className="p-2 rounded-lg bg-slate-900 hover:bg-slate-800 text-slate-400 hover:text-slate-200 border border-slate-800 transition-colors disabled:opacity-50"
+            className="p-2 rounded-lg bg-slate-900 hover:bg-slate-800 text-slate-400 hover:text-slate-200 border border-slate-800 transition-colors disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-400 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950 cursor-pointer"
           >
-            <RefreshCw className="w-4 h-4" />
+            <RefreshCw className="w-4 h-4" aria-hidden="true" />
           </button>
         </div>
       </div>

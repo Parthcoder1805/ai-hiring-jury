@@ -1,7 +1,7 @@
 import React from "react";
 import { AgentEvaluation } from "@/types/jury";
 import { SourceBadge } from "./SourceBadge";
-import { ShieldCheck, CheckCircle, AlertTriangle, HelpCircle, Activity } from "lucide-react";
+import { ShieldCheck, CheckCircle, AlertTriangle, Activity } from "lucide-react";
 
 interface AgentDashboardProps {
   evaluations: {
@@ -54,31 +54,42 @@ export const AgentDashboard: React.FC<AgentDashboardProps> = ({ evaluations }) =
           </p>
         </div>
 
-        <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-emerald-950/40 border border-emerald-700/40 text-emerald-300 text-xs font-semibold">
-          <ShieldCheck className="w-4 h-4 text-emerald-400" />
+        <div
+          className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-emerald-950/40 border border-emerald-700/40 text-emerald-300 text-xs font-semibold"
+          role="status"
+          aria-label="Cross-agent leakage verification: 0 percent guaranteed"
+        >
+          <ShieldCheck className="w-4 h-4 text-emerald-400" aria-hidden="true" />
           <span>Cross-Agent Leakage: 0% Guaranteed</span>
         </div>
       </div>
 
       {/* 4 Cards Grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6" role="list" aria-label="Independent AI persona evaluation cards">
         {agents.map(({ eval: agent, badgeColor }) => {
           const isSkeptic = agent.agentRole === "skeptic";
           return (
-            <div
+            <section
               key={agent.agentRole}
+              role="listitem"
+              aria-labelledby={`persona-heading-${agent.agentRole}`}
               className="rounded-2xl bg-slate-900/90 border border-slate-800 p-6 flex flex-col justify-between space-y-5 shadow-xl hover:border-slate-700 transition-all"
             >
               {/* Card Header */}
               <div className="space-y-4">
                 <div className="flex items-start justify-between gap-3">
                   <div className="flex items-center gap-3">
-                    <div className="w-12 h-12 rounded-2xl bg-slate-800 border border-slate-700 flex items-center justify-center text-2xl shadow-inner">
+                    <div
+                      className="w-12 h-12 rounded-2xl bg-slate-800 border border-slate-700 flex items-center justify-center text-2xl shadow-inner"
+                      aria-hidden="true"
+                    >
                       {agent.avatar}
                     </div>
                     <div>
                       <div className="flex items-center gap-2">
-                        <h3 className="text-base font-bold text-white">{agent.agentName}</h3>
+                        <h3 id={`persona-heading-${agent.agentRole}`} className="text-base font-bold text-white">
+                          {agent.agentName}
+                        </h3>
                         <span className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase ${badgeColor}`}>
                           {agent.agentRole.replace("_", " ")}
                         </span>
@@ -103,7 +114,7 @@ export const AgentDashboard: React.FC<AgentDashboardProps> = ({ evaluations }) =
                       {agent.recommendation}
                     </span>
                     <div className="mt-1 flex items-center justify-end gap-1.5 text-xs text-slate-400">
-                      <Activity className="w-3 h-3 text-indigo-400" />
+                      <Activity className="w-3 h-3 text-indigo-400" aria-hidden="true" />
                       <span>Confidence: <strong className="text-white">{agent.confidenceScore}%</strong></span>
                     </div>
                   </div>
@@ -118,8 +129,8 @@ export const AgentDashboard: React.FC<AgentDashboardProps> = ({ evaluations }) =
                 {/* Strengths */}
                 <div className="space-y-2">
                   <div className="text-xs font-bold text-slate-300 flex items-center gap-1.5">
-                    <CheckCircle className="w-3.5 h-3.5 text-emerald-400" />
-                    <span>Evidence-Backed Strengths</span>
+                    <CheckCircle className="w-3.5 h-3.5 text-emerald-400" aria-hidden="true" />
+                    <h4>Evidence-Backed Strengths</h4>
                   </div>
                   <div className="space-y-2">
                     {agent.strengths.map((str, sIdx) => (
@@ -143,8 +154,8 @@ export const AgentDashboard: React.FC<AgentDashboardProps> = ({ evaluations }) =
                 {/* Concerns / Red Flags */}
                 <div className="space-y-2">
                   <div className="text-xs font-bold text-slate-300 flex items-center gap-1.5">
-                    <AlertTriangle className="w-3.5 h-3.5 text-amber-400" />
-                    <span>{isSkeptic ? "Adversarial Red Flags & Discrepancies" : "Identified Concerns"}</span>
+                    <AlertTriangle className="w-3.5 h-3.5 text-amber-400" aria-hidden="true" />
+                    <h4>{isSkeptic ? "Adversarial Red Flags & Discrepancies" : "Identified Concerns"}</h4>
                   </div>
                   <div className="space-y-2">
                     {isSkeptic && agent.skepticFlags ? (
@@ -213,12 +224,12 @@ export const AgentDashboard: React.FC<AgentDashboardProps> = ({ evaluations }) =
               {/* Isolation Proof Footer */}
               <div className="pt-3 border-t border-slate-800/80 flex items-center justify-between text-[10px] font-mono text-slate-500">
                 <div className="flex items-center gap-1.5">
-                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" aria-hidden="true" />
                   <span>Call ID: {agent.isolatedExecutionProof.callId.slice(0, 14)}...</span>
                 </div>
                 <span>Tokens: ~{agent.isolatedExecutionProof.inputTokenEstimate + agent.isolatedExecutionProof.outputTokenEstimate}</span>
               </div>
-            </div>
+            </section>
           );
         })}
       </div>

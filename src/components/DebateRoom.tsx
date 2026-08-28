@@ -41,10 +41,16 @@ export const DebateRoom: React.FC<DebateRoomProps> = ({ debate }) => {
   return (
     <div className="w-full max-w-6xl mx-auto space-y-6">
       {/* Section Header */}
-      <div className="rounded-2xl bg-slate-900/90 border border-slate-800 p-6 shadow-xl space-y-3">
+      <section
+        aria-label="Debate Stage Overview"
+        className="rounded-2xl bg-slate-900/90 border border-slate-800 p-6 shadow-xl space-y-3"
+      >
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-800 pb-4">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-amber-500 to-indigo-600 flex items-center justify-center text-white shadow-lg">
+            <div
+              className="w-10 h-10 rounded-xl bg-gradient-to-tr from-amber-500 to-indigo-600 flex items-center justify-center text-white shadow-lg"
+              aria-hidden="true"
+            >
               <MessageSquare className="w-5 h-5" />
             </div>
             <div>
@@ -63,7 +69,7 @@ export const DebateRoom: React.FC<DebateRoomProps> = ({ debate }) => {
           </div>
 
           <div className="flex items-center gap-2 text-xs text-slate-400">
-            <ShieldCheck className="w-4 h-4 text-indigo-400" />
+            <ShieldCheck className="w-4 h-4 text-indigo-400" aria-hidden="true" />
             <span>{debate.rounds.length} Interactive Turns</span>
           </div>
         </div>
@@ -71,17 +77,23 @@ export const DebateRoom: React.FC<DebateRoomProps> = ({ debate }) => {
         <div className="text-xs text-slate-300">
           <strong className="text-white">Debate Core Subject:</strong> {debate.topicOfDebate}
         </div>
-      </div>
+      </section>
 
       {/* Debate Timeline Messages */}
-      <div className="space-y-4 relative before:absolute before:inset-0 before:left-6 before:w-0.5 before:bg-slate-800/80 before:hidden sm:before:block">
-        {debate.rounds.map((round, idx) => {
+      <section
+        aria-label="Debate Turns Timeline"
+        className="space-y-4 relative before:absolute before:inset-0 before:left-6 before:w-0.5 before:bg-slate-800/80 before:hidden sm:before:block"
+        role="list"
+      >
+        {debate.rounds.map((round) => {
           const speakerTheme = getAgentColor(round.speaker);
           const responderTheme = getAgentColor(round.respondingTo);
 
           return (
-            <div
+            <article
               key={round.id}
+              role="listitem"
+              aria-label={`Round ${round.roundNumber}: ${round.speakerName} responding to ${round.respondingToName}`}
               className={`relative rounded-2xl bg-slate-900/95 border ${
                 round.changedMind ? "border-amber-500/60 ring-1 ring-amber-500/20" : "border-slate-800"
               } p-5 space-y-3.5 shadow-xl transition-all hover:border-slate-700`}
@@ -89,7 +101,10 @@ export const DebateRoom: React.FC<DebateRoomProps> = ({ debate }) => {
               {/* Turn Header */}
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-800/80 pb-3">
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-xl bg-slate-800 border border-slate-700 flex items-center justify-center text-xl shadow-inner">
+                  <div
+                    className="w-10 h-10 rounded-xl bg-slate-800 border border-slate-700 flex items-center justify-center text-xl shadow-inner"
+                    aria-hidden="true"
+                  >
                     {getAgentAvatar(round.speaker)}
                   </div>
                   <div>
@@ -103,7 +118,7 @@ export const DebateRoom: React.FC<DebateRoomProps> = ({ debate }) => {
                     {/* Responding to indicator */}
                     {round.respondingTo !== "general" && (
                       <div className="flex items-center gap-1.5 text-xs text-slate-400 mt-0.5">
-                        <ArrowDownRight className="w-3.5 h-3.5 text-slate-500" />
+                        <ArrowDownRight className="w-3.5 h-3.5 text-slate-500" aria-hidden="true" />
                         <span>Responded directly to:</span>
                         <span className={`font-semibold ${responderTheme.text}`}>
                           {round.respondingToName}
@@ -137,9 +152,13 @@ export const DebateRoom: React.FC<DebateRoomProps> = ({ debate }) => {
 
               {/* STANCE REVISION / CONCESSION CALLOUT (If agent changed mind) */}
               {round.changedMind && (
-                <div className="p-3.5 rounded-xl bg-amber-950/30 border border-amber-500/50 space-y-2">
+                <div
+                  role="status"
+                  aria-label="Agent position concession registered"
+                  className="p-3.5 rounded-xl bg-amber-950/30 border border-amber-500/50 space-y-2"
+                >
                   <div className="flex items-center gap-2 text-xs font-bold text-amber-300">
-                    <RefreshCw className="w-4 h-4 text-amber-400 animate-spin-slow" />
+                    <RefreshCw className="w-4 h-4 text-amber-400 animate-spin-slow" aria-hidden="true" />
                     <span>Agent Position Revision Registered</span>
                     {round.confidenceDelta !== undefined && (
                       <span className="text-[10px] px-1.5 py-0.5 rounded bg-amber-900/60 text-amber-200">
@@ -181,44 +200,50 @@ export const DebateRoom: React.FC<DebateRoomProps> = ({ debate }) => {
                   ))}
                 </div>
               )}
-            </div>
+            </article>
           );
         })}
-      </div>
+      </section>
 
       {/* Debate Synthesis & Unresolved Disagreements Summary */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-2">
         {/* Consensus Points */}
-        <div className="rounded-2xl bg-slate-900/90 border border-slate-800 p-5 space-y-3 shadow-xl">
+        <section
+          aria-labelledby="consensus-heading"
+          className="rounded-2xl bg-slate-900/90 border border-slate-800 p-5 space-y-3 shadow-xl"
+        >
           <div className="flex items-center gap-2 text-sm font-bold text-emerald-400">
-            <CheckCircle2 className="w-4 h-4" />
-            <span>Consensus Points Established</span>
+            <CheckCircle2 className="w-4 h-4" aria-hidden="true" />
+            <h3 id="consensus-heading">Consensus Points Established</h3>
           </div>
           <ul className="space-y-2">
             {debate.consensusPoints.map((cp, idx) => (
               <li key={idx} className="p-2.5 rounded-lg bg-slate-950/60 border border-emerald-950 text-xs text-slate-300 flex items-start gap-2">
-                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 mt-1.5 flex-shrink-0" />
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 mt-1.5 flex-shrink-0" aria-hidden="true" />
                 <span>{cp}</span>
               </li>
             ))}
           </ul>
-        </div>
+        </section>
 
         {/* Unresolved Disagreements */}
-        <div className="rounded-2xl bg-slate-900/90 border border-slate-800 p-5 space-y-3 shadow-xl">
+        <section
+          aria-labelledby="unresolved-tensions-heading"
+          className="rounded-2xl bg-slate-900/90 border border-slate-800 p-5 space-y-3 shadow-xl"
+        >
           <div className="flex items-center gap-2 text-sm font-bold text-amber-400">
-            <AlertOctagon className="w-4 h-4" />
-            <span>Remaining Unresolved Tensions</span>
+            <AlertOctagon className="w-4 h-4" aria-hidden="true" />
+            <h3 id="unresolved-tensions-heading">Remaining Unresolved Tensions</h3>
           </div>
           <ul className="space-y-2">
             {debate.unresolvedDisagreements.map((ud, idx) => (
               <li key={idx} className="p-2.5 rounded-lg bg-slate-950/60 border border-amber-950 text-xs text-slate-300 flex items-start gap-2">
-                <span className="w-1.5 h-1.5 rounded-full bg-amber-400 mt-1.5 flex-shrink-0" />
+                <span className="w-1.5 h-1.5 rounded-full bg-amber-400 mt-1.5 flex-shrink-0" aria-hidden="true" />
                 <span>{ud}</span>
               </li>
             ))}
           </ul>
-        </div>
+        </section>
       </div>
     </div>
   );

@@ -1,7 +1,16 @@
 import React from "react";
 import { CandidateProfile } from "@/types/jury";
 import { SourceBadge } from "./SourceBadge";
-import { User, Briefcase, GraduationCap, Code, AlertTriangle, CheckCircle, HelpCircle, Layers } from "lucide-react";
+import {
+  User,
+  Briefcase,
+  GraduationCap,
+  AlertTriangle,
+  CheckCircle,
+  Code,
+  Layers,
+  HelpCircle,
+} from "lucide-react";
 
 interface CandidateProfileViewProps {
   profile: CandidateProfile;
@@ -9,83 +18,100 @@ interface CandidateProfileViewProps {
 
 export const CandidateProfileView: React.FC<CandidateProfileViewProps> = ({ profile }) => {
   return (
-    <div className="w-full max-w-6xl mx-auto space-y-6">
-      {/* Header Card */}
-      <div className="rounded-2xl bg-slate-900/90 border border-slate-800 p-6 shadow-xl">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-800 pb-5">
-          <div className="flex items-center gap-4">
-            <div className="w-14 h-14 rounded-2xl bg-gradient-to-tr from-blue-600 to-indigo-600 flex items-center justify-center text-2xl font-bold text-white shadow-lg">
-              <User className="w-7 h-7" />
+    <div className="space-y-6">
+      {/* Header Info Card */}
+      <section
+        aria-label="Candidate Profile Summary"
+        className="rounded-2xl bg-slate-900/90 border border-slate-800 p-6 space-y-4 shadow-xl"
+      >
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-slate-800 pb-4">
+          <div className="flex items-center gap-3">
+            <div
+              className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-blue-600 to-indigo-600 flex items-center justify-center text-white shadow-lg shadow-indigo-600/20"
+              aria-hidden="true"
+            >
+              <User className="w-6 h-6" />
             </div>
             <div>
-              <div className="flex items-center gap-2">
-                <h2 className="text-xl font-bold text-white">{profile.name}</h2>
-                <span className="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-blue-500/20 text-blue-300 border border-blue-500/30">
-                  Target: {profile.targetRole}
+              <h2 className="text-xl font-bold text-white tracking-tight">{profile.name}</h2>
+              <div className="flex items-center gap-2 mt-0.5">
+                <span className="text-xs text-indigo-400 font-medium">{profile.targetRole}</span>
+                <span className="text-xs text-slate-500" aria-hidden="true">•</span>
+                <span className="text-xs text-slate-400">
+                  Extracted {new Date(profile.extractedAt).toLocaleDateString()}
                 </span>
               </div>
-              <p className="text-xs text-slate-400 mt-1 max-w-3xl leading-relaxed">{profile.summary}</p>
             </div>
-          </div>
-
-          <div className="flex sm:flex-col items-end justify-between text-xs text-slate-400">
-            <span className="font-mono text-[11px] text-slate-500">
-              Extracted: {new Date(profile.extractedAt).toLocaleDateString()}
-            </span>
-            <span className="text-emerald-400 font-medium">✓ Structured & Evidence-Linked</span>
           </div>
         </div>
 
-        {/* Education & Overview Row */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-4">
-          <div className="p-3.5 rounded-xl bg-slate-950/60 border border-slate-800/80 space-y-2">
-            <div className="flex items-center gap-2 text-xs font-bold text-slate-300">
-              <GraduationCap className="w-4 h-4 text-blue-400" />
-              <span>Verified Education</span>
-            </div>
-            {profile.education.map((edu, idx) => (
-              <div key={idx} className="text-xs text-slate-300">
-                <div className="font-medium text-white">{edu.institution}</div>
-                <div className="text-slate-400">{edu.degree} {edu.year ? `(${edu.year})` : ""}</div>
-                {edu.evidenceQuote && (
-                  <div className="mt-1">
-                    <SourceBadge source={edu.evidenceQuote.source} location={edu.evidenceQuote.location} />
-                  </div>
-                )}
-              </div>
-            ))}
-          </div>
+        {/* Executive Summary */}
+        <div className="space-y-1">
+          <h3 className="text-xs font-bold uppercase tracking-wider text-slate-400">
+            Synthesized Profile Summary
+          </h3>
+          <p className="text-xs sm:text-sm text-slate-300 leading-relaxed">{profile.summary}</p>
+        </div>
 
-          <div className="p-3.5 rounded-xl bg-slate-950/60 border border-slate-800/80 space-y-2">
-            <div className="flex items-center gap-2 text-xs font-bold text-slate-300">
-              <Briefcase className="w-4 h-4 text-indigo-400" />
-              <span>Work Experience Track</span>
+        {/* Work Experience & Education Quick Badges */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2">
+          {/* Work Experience */}
+          <div className="space-y-2">
+            <div className="flex items-center gap-1.5 text-xs font-bold text-slate-300">
+              <Briefcase className="w-3.5 h-3.5 text-indigo-400" aria-hidden="true" />
+              <h4>Recent Experience</h4>
             </div>
             <div className="space-y-1.5">
               {profile.experience.map((exp, idx) => (
-                <div key={idx} className="text-xs text-slate-300 flex items-start justify-between">
-                  <div>
-                    <span className="font-medium text-white">{exp.role}</span>
-                    <span className="text-slate-400"> @ {exp.company}</span>
+                <div key={idx} className="p-2.5 rounded-lg bg-slate-950/60 border border-slate-800 text-xs">
+                  <div className="flex items-center justify-between font-semibold text-slate-200">
+                    <span>{exp.role}</span>
+                    <span className="text-[11px] text-slate-400 font-mono">{exp.duration}</span>
                   </div>
-                  <span className="text-[11px] font-mono text-slate-400">{exp.duration}</span>
+                  <div className="text-[11px] text-indigo-300">{exp.company}</div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Education */}
+          <div className="space-y-2">
+            <div className="flex items-center gap-1.5 text-xs font-bold text-slate-300">
+              <GraduationCap className="w-3.5 h-3.5 text-purple-400" aria-hidden="true" />
+              <h4>Education & Credentials</h4>
+            </div>
+            <div className="space-y-1.5">
+              {profile.education.map((edu, idx) => (
+                <div key={idx} className="p-2.5 rounded-lg bg-slate-950/60 border border-slate-800 text-xs">
+                  <div className="font-semibold text-slate-200">{edu.degree}</div>
+                  <div className="flex items-center justify-between text-[11px] text-slate-400">
+                    <span>{edu.institution}</span>
+                    {edu.year && <span className="font-mono">{edu.year}</span>}
+                  </div>
                 </div>
               ))}
             </div>
           </div>
         </div>
-      </div>
+      </section>
 
-      {/* DISCREPANCY & INCONSISTENCY HIGHLIGHTS (If any detected) */}
+      {/* CROSS-SOURCE INCONSISTENCY HIGHLIGHTS */}
       {profile.inconsistencies.length > 0 && (
-        <div className="rounded-2xl bg-amber-950/20 border border-amber-500/40 p-5 space-y-3">
-          <div className="flex items-center gap-2 text-amber-300 font-bold text-sm">
-            <AlertTriangle className="w-4 h-4 text-amber-400" />
-            <span>Cross-Source Discrepancies & Depth Mismatches ({profile.inconsistencies.length})</span>
+        <section
+          aria-labelledby="inconsistencies-heading"
+          className="rounded-2xl bg-slate-900/90 border border-amber-500/30 p-6 space-y-4 shadow-xl shadow-amber-950/10"
+        >
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <AlertTriangle className="w-5 h-5 text-amber-400" aria-hidden="true" />
+              <h3 id="inconsistencies-heading" className="text-sm font-bold text-white">
+                Cross-Source Discrepancies & Depth Mismatches ({profile.inconsistencies.length})
+              </h3>
+            </div>
+            <span className="text-xs text-amber-400/80 font-medium">
+              Flagged between Resume Claims and Interview Admissions
+            </span>
           </div>
-          <p className="text-xs text-amber-200/80">
-            The profile builder compared resume assertions against verbatim interview responses and detected the following nuances:
-          </p>
 
           <div className="space-y-3 pt-1">
             {profile.inconsistencies.map((inc) => (
@@ -130,14 +156,17 @@ export const CandidateProfileView: React.FC<CandidateProfileViewProps> = ({ prof
               </div>
             ))}
           </div>
-        </div>
+        </section>
       )}
 
       {/* SKILLS BREAKDOWN: Claimed vs Demonstrated Depth */}
-      <div className="rounded-2xl bg-slate-900/90 border border-slate-800 p-6 space-y-4 shadow-xl">
+      <section
+        aria-labelledby="skills-inventory-heading"
+        className="rounded-2xl bg-slate-900/90 border border-slate-800 p-6 space-y-4 shadow-xl"
+      >
         <div className="flex items-center gap-2 text-sm font-bold text-white">
-          <Code className="w-4 h-4 text-indigo-400" />
-          <span>Skills Inventory: Claimed vs Demonstrated Depth</span>
+          <Code className="w-4 h-4 text-indigo-400" aria-hidden="true" />
+          <h3 id="skills-inventory-heading">Skills Inventory: Claimed vs Demonstrated Depth</h3>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -184,30 +213,38 @@ export const CandidateProfileView: React.FC<CandidateProfileViewProps> = ({ prof
             </div>
           ))}
         </div>
-      </div>
+      </section>
 
       {/* VERIFIED CLAIMS AUDIT TABLE */}
-      <div className="rounded-2xl bg-slate-900/90 border border-slate-800 p-6 space-y-4 shadow-xl">
+      <section
+        aria-labelledby="claims-audit-heading"
+        className="rounded-2xl bg-slate-900/90 border border-slate-800 p-6 space-y-4 shadow-xl"
+      >
         <div className="flex items-center gap-2 text-sm font-bold text-white">
-          <Layers className="w-4 h-4 text-blue-400" />
-          <span>Extracted Candidate Claims & Evidence Traceability</span>
+          <Layers className="w-4 h-4 text-blue-400" aria-hidden="true" />
+          <h3 id="claims-audit-heading">Extracted Candidate Claims & Evidence Traceability</h3>
         </div>
 
         <div className="overflow-x-auto">
           <table className="w-full text-left text-xs border-collapse">
+            <caption className="sr-only">
+              Extracted candidate claims, sources, verification categories, and evidence audit notes
+            </caption>
             <thead>
               <tr className="border-b border-slate-800 text-slate-400 uppercase text-[10px] tracking-wider">
-                <th className="py-2.5 px-3">Claim</th>
-                <th className="py-2.5 px-3">Source</th>
-                <th className="py-2.5 px-3">Category</th>
-                <th className="py-2.5 px-3">Verification Status</th>
-                <th className="py-2.5 px-3">Audit Notes</th>
+                <th scope="col" className="py-2.5 px-3">Claim</th>
+                <th scope="col" className="py-2.5 px-3">Source</th>
+                <th scope="col" className="py-2.5 px-3">Category</th>
+                <th scope="col" className="py-2.5 px-3">Verification Status</th>
+                <th scope="col" className="py-2.5 px-3">Audit Notes</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-800/60">
               {profile.claims.map((claim) => (
                 <tr key={claim.id} className="hover:bg-slate-950/40 transition-colors">
-                  <td className="py-3 px-3 font-medium text-slate-200 max-w-xs">{claim.claim}</td>
+                  <th scope="row" className="py-3 px-3 font-medium text-slate-200 max-w-xs text-left font-normal">
+                    {claim.claim}
+                  </th>
                   <td className="py-3 px-3 whitespace-nowrap">
                     <SourceBadge source={claim.source} />
                   </td>
@@ -224,9 +261,9 @@ export const CandidateProfileView: React.FC<CandidateProfileViewProps> = ({ prof
                           : "bg-slate-800 text-slate-400"
                       }`}
                     >
-                      {claim.verifiedStatus === "supported" && <CheckCircle className="w-3 h-3 text-emerald-400" />}
-                      {claim.verifiedStatus === "exaggerated" && <AlertTriangle className="w-3 h-3 text-amber-400" />}
-                      {claim.verifiedStatus === "unverified" && <HelpCircle className="w-3 h-3 text-slate-400" />}
+                      {claim.verifiedStatus === "supported" && <CheckCircle className="w-3 h-3 text-emerald-400" aria-hidden="true" />}
+                      {claim.verifiedStatus === "exaggerated" && <AlertTriangle className="w-3 h-3 text-amber-400" aria-hidden="true" />}
+                      {claim.verifiedStatus === "unverified" && <HelpCircle className="w-3 h-3 text-slate-400" aria-hidden="true" />}
                       <span>{claim.verifiedStatus}</span>
                     </span>
                   </td>
@@ -236,7 +273,7 @@ export const CandidateProfileView: React.FC<CandidateProfileViewProps> = ({ prof
             </tbody>
           </table>
         </div>
-      </div>
+      </section>
     </div>
   );
 };

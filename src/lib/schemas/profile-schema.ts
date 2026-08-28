@@ -127,3 +127,5 @@ export const CandidateProfileSchema = z.object({
   missingInformation: z.array(z.union([z.string(), z.record(z.any())]).transform((v) => typeof v === "string" ? v : (v.topic ? `${v.topic}: ${v.description || JSON.stringify(v)}` : JSON.stringify(v)))).default([]),
   extractedAt: z.string().default(() => new Date().toISOString()),
 });
+
+export type CandidateProfile = z.infer<typeof CandidateProfileSchema>;

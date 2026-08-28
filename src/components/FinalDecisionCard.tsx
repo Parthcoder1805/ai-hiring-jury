@@ -1,7 +1,7 @@
 import React from "react";
 import { FinalDecision } from "@/types/jury";
 import { SourceBadge } from "./SourceBadge";
-import { Scale, CheckCircle2, AlertTriangle, ShieldCheck, HelpCircle, ArrowRight, BookOpen, Ban } from "lucide-react";
+import { Scale, CheckCircle2, AlertTriangle, HelpCircle, BookOpen, Ban } from "lucide-react";
 
 interface FinalDecisionCardProps {
   decision: FinalDecision;
@@ -54,18 +54,24 @@ export const FinalDecisionCard: React.FC<FinalDecisionCardProps> = ({ decision }
   return (
     <div className="w-full max-w-6xl mx-auto space-y-6">
       {/* HERO VERDICT CARD */}
-      <div className={`rounded-3xl border ${style.bg} p-6 sm:p-8 shadow-2xl ${style.glow} space-y-6 backdrop-blur-md`}>
+      <section
+        aria-label="Final Verdict Overview"
+        className={`rounded-3xl border ${style.bg} p-6 sm:p-8 shadow-2xl ${style.glow} space-y-6 backdrop-blur-md`}
+      >
         {/* Anti-Averaging Audit Header */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-white/10 pb-4">
           <div className="flex items-center gap-2">
-            <Scale className="w-5 h-5 text-indigo-400" />
-            <span className="text-xs font-bold uppercase tracking-wider text-white">
+            <Scale className="w-5 h-5 text-indigo-400" aria-hidden="true" />
+            <h2 className="text-xs font-bold uppercase tracking-wider text-white">
               Stage 4: Final Jury Verdict & Synthesis
-            </span>
+            </h2>
           </div>
 
-          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-950/60 border border-white/15 text-[11px] text-slate-300">
-            <Ban className="w-3.5 h-3.5 text-amber-400" />
+          <div
+            className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-950/60 border border-white/15 text-[11px] text-slate-300"
+            role="status"
+          >
+            <Ban className="w-3.5 h-3.5 text-amber-400" aria-hidden="true" />
             <span>Score Averaging Strictly Prohibited • Reasoned Synthesis</span>
           </div>
         </div>
@@ -77,15 +83,23 @@ export const FinalDecisionCard: React.FC<FinalDecisionCardProps> = ({ decision }
               Jury Recommendation
             </div>
             <div className="flex items-center gap-3">
-              <span className="text-2xl sm:text-3xl">{style.icon}</span>
-              <div className={`px-5 py-2 rounded-2xl text-xl sm:text-2xl tracking-tight uppercase shadow-lg ${style.pill}`}>
+              <span className="text-2xl sm:text-3xl" aria-hidden="true">{style.icon}</span>
+              <div
+                className={`px-5 py-2 rounded-2xl text-xl sm:text-2xl tracking-tight uppercase shadow-lg ${style.pill}`}
+                role="status"
+                aria-label={`Final recommendation verdict: ${decision.recommendation}`}
+              >
                 {decision.recommendation}
               </div>
             </div>
           </div>
 
           {/* Evidence-Weighted Confidence Meter */}
-          <div className="p-4 rounded-2xl bg-slate-950/60 border border-white/10 flex items-center gap-5 min-w-[240px]">
+          <div
+            className="p-4 rounded-2xl bg-slate-950/60 border border-white/10 flex items-center gap-5 min-w-[240px]"
+            role="region"
+            aria-label={`Evidence-weighted confidence score: ${decision.confidenceScore} percent`}
+          >
             <div className="space-y-1">
               <div className="text-[11px] uppercase font-bold text-slate-400">
                 Evidence-Weighted Confidence
@@ -97,7 +111,10 @@ export const FinalDecisionCard: React.FC<FinalDecisionCardProps> = ({ decision }
                 Calibrated against source quotes
               </div>
             </div>
-            <div className="w-16 h-16 rounded-full bg-slate-900 border-4 border-indigo-500/40 flex items-center justify-center font-bold text-sm text-indigo-300">
+            <div
+              className="w-16 h-16 rounded-full bg-slate-900 border-4 border-indigo-500/40 flex items-center justify-center font-bold text-sm text-indigo-300"
+              aria-hidden="true"
+            >
               {decision.confidenceScore}%
             </div>
           </div>
@@ -106,8 +123,8 @@ export const FinalDecisionCard: React.FC<FinalDecisionCardProps> = ({ decision }
         {/* Executive Reasoning */}
         <div className="p-5 rounded-2xl bg-slate-950/70 border border-white/10 space-y-2">
           <div className="text-xs uppercase font-bold text-indigo-300 flex items-center gap-1.5">
-            <BookOpen className="w-4 h-4 text-indigo-400" />
-            <span>Executive Decision Rationale</span>
+            <BookOpen className="w-4 h-4 text-indigo-400" aria-hidden="true" />
+            <h3>Executive Decision Rationale</h3>
           </div>
           <p className="text-xs sm:text-sm text-slate-200 leading-relaxed">
             {decision.executiveReasoning}
@@ -133,15 +150,18 @@ export const FinalDecisionCard: React.FC<FinalDecisionCardProps> = ({ decision }
             <p className="text-slate-300 text-[11px]">{decision.synthesisBreakdown.skepticRiskWeighting}</p>
           </div>
         </div>
-      </div>
+      </section>
 
       {/* KEY STRENGTHS & KEY RISKS */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {/* Strengths */}
-        <div className="rounded-2xl bg-slate-900/90 border border-slate-800 p-6 space-y-4 shadow-xl">
+        <section
+          aria-labelledby="verdict-strengths-heading"
+          className="rounded-2xl bg-slate-900/90 border border-slate-800 p-6 space-y-4 shadow-xl"
+        >
           <div className="flex items-center gap-2 text-sm font-bold text-emerald-400">
-            <CheckCircle2 className="w-4 h-4" />
-            <span>Primary Evidence-Backed Strengths</span>
+            <CheckCircle2 className="w-4 h-4" aria-hidden="true" />
+            <h3 id="verdict-strengths-heading">Primary Evidence-Backed Strengths</h3>
           </div>
 
           <div className="space-y-3">
@@ -164,13 +184,16 @@ export const FinalDecisionCard: React.FC<FinalDecisionCardProps> = ({ decision }
               </div>
             ))}
           </div>
-        </div>
+        </section>
 
         {/* Risks */}
-        <div className="rounded-2xl bg-slate-900/90 border border-slate-800 p-6 space-y-4 shadow-xl">
+        <section
+          aria-labelledby="verdict-risks-heading"
+          className="rounded-2xl bg-slate-900/90 border border-slate-800 p-6 space-y-4 shadow-xl"
+        >
           <div className="flex items-center gap-2 text-sm font-bold text-amber-400">
-            <AlertTriangle className="w-4 h-4" />
-            <span>Operational & Technical Risks</span>
+            <AlertTriangle className="w-4 h-4" aria-hidden="true" />
+            <h3 id="verdict-risks-heading">Operational & Technical Risks</h3>
           </div>
 
           <div className="space-y-3">
@@ -206,14 +229,17 @@ export const FinalDecisionCard: React.FC<FinalDecisionCardProps> = ({ decision }
               </div>
             ))}
           </div>
-        </div>
+        </section>
       </div>
 
       {/* TARGETED NEXT-ROUND INTERVIEW PROBES */}
-      <div className="rounded-2xl bg-slate-900/90 border border-slate-800 p-6 space-y-4 shadow-xl">
+      <section
+        aria-labelledby="probes-heading"
+        className="rounded-2xl bg-slate-900/90 border border-slate-800 p-6 space-y-4 shadow-xl"
+      >
         <div className="flex items-center gap-2 text-sm font-bold text-indigo-300">
-          <HelpCircle className="w-4 h-4 text-indigo-400" />
-          <span>Recommended Next-Round Interview Probes (High-Signal Technical Deep-Dives)</span>
+          <HelpCircle className="w-4 h-4 text-indigo-400" aria-hidden="true" />
+          <h3 id="probes-heading">Recommended Next-Round Interview Probes (High-Signal Technical Deep-Dives)</h3>
         </div>
         <p className="text-xs text-slate-400">
           Designed by the Jury to definitively resolve remaining uncertainties in the subsequent interview:
@@ -226,7 +252,10 @@ export const FinalDecisionCard: React.FC<FinalDecisionCardProps> = ({ decision }
               className="p-4 rounded-xl bg-slate-950/80 border border-indigo-900/40 text-xs space-y-2"
             >
               <div className="flex items-center gap-2 font-bold text-indigo-300">
-                <span className="w-5 h-5 rounded-full bg-indigo-600/30 text-indigo-300 flex items-center justify-center text-[10px]">
+                <span
+                  className="w-5 h-5 rounded-full bg-indigo-600/30 text-indigo-300 flex items-center justify-center text-[10px]"
+                  aria-hidden="true"
+                >
                   {idx + 1}
                 </span>
                 <span>Area: {probe.area}</span>
@@ -245,25 +274,28 @@ export const FinalDecisionCard: React.FC<FinalDecisionCardProps> = ({ decision }
             </div>
           ))}
         </div>
-      </div>
+      </section>
 
       {/* ALTERNATIVES CONSIDERED AUDIT */}
-      <div className="rounded-2xl bg-slate-900/80 border border-slate-800 p-5 space-y-3 text-xs text-slate-400">
-        <div className="font-bold text-slate-300 text-xs">
+      <section
+        aria-label="Alternatives Considered Audit"
+        className="rounded-2xl bg-slate-900/80 border border-slate-800 p-5 space-y-3 text-xs text-slate-400"
+      >
+        <h3 className="font-bold text-slate-300 text-xs">
           Judicial Audit: Alternatives Considered & Rejected
-        </div>
+        </h3>
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
           {decision.decisionAuditTrail.alternativesConsideredAndRejected.map((alt, idx) => (
             <div key={idx} className="p-3 rounded-xl bg-slate-950/60 border border-slate-800 space-y-1">
               <div className="font-bold text-slate-300 flex items-center gap-1.5">
-                <span className="text-red-400">✕</span>
+                <span className="text-red-400" aria-hidden="true">✕</span>
                 <span>{alt.option}</span>
               </div>
               <p className="text-[11px] text-slate-400">{alt.rejectionReason}</p>
             </div>
           ))}
         </div>
-      </div>
+      </section>
     </div>
   );
 };

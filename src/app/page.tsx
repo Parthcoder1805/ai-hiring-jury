@@ -23,15 +23,15 @@ import {
   Sparkles,
 } from "lucide-react";
 
+type TabKey = "verdict" | "profile" | "agents" | "debate" | "report" | "inspector";
+
 export default function Home() {
   const [resumeText, setResumeText] = useState<string>("");
   const [transcriptText, setTranscriptText] = useState<string>("");
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
   const [result, setResult] = useState<FullAnalysisResult | null>(null);
-  const [activeTab, setActiveTab] = useState<
-    "verdict" | "profile" | "agents" | "debate" | "report" | "inspector"
-  >("verdict");
+  const [activeTab, setActiveTab] = useState<TabKey>("verdict");
 
   const [providerInfo, setProviderInfo] = useState<{
     provider: string;
@@ -174,6 +174,37 @@ export default function Home() {
     }
   };
 
+  const tabs: { id: TabKey; label: string; icon: React.FC<{ className?: string }> }[] = [
+    { id: "verdict", label: "Final Verdict & Synthesis", icon: Scale },
+    {
+      id: "profile",
+      label: `Candidate Profile (${result?.candidateProfile.skills.length ?? 0} Skills)`,
+      icon: FileSpreadsheet,
+    },
+    { id: "agents", label: "4 Independent Personas", icon: Users },
+    {
+      id: "debate",
+      label: `Debate Room (${result?.debate.rounds.length ?? 0} Turns)`,
+      icon: MessageSquare,
+    },
+    { id: "report", label: "Decision Packet", icon: FileText },
+    { id: "inspector", label: "Observability Audit", icon: Activity },
+  ];
+
+  const handleTabKeyDown = (e: React.KeyboardEvent<HTMLButtonElement>, currentIndex: number) => {
+    if (e.key === "ArrowRight") {
+      e.preventDefault();
+      const nextIndex = (currentIndex + 1) % tabs.length;
+      setActiveTab(tabs[nextIndex].id);
+      document.getElementById(`tab-${tabs[nextIndex].id}`)?.focus();
+    } else if (e.key === "ArrowLeft") {
+      e.preventDefault();
+      const prevIndex = (currentIndex - 1 + tabs.length) % tabs.length;
+      setActiveTab(tabs[prevIndex].id);
+      document.getElementById(`tab-${tabs[prevIndex].id}`)?.focus();
+    }
+  };
+
   return (
     <div className="flex-1 flex flex-col">
       <Navbar
@@ -184,17 +215,26 @@ export default function Home() {
         isLoading={isLoading}
       />
 
-      <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-8">
-        {/* Error Alert */}
+      <main
+        id="main-content"
+        className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-8 focus:outline-none"
+        tabIndex={-1}
+      >
+        {/* Error Alert with ARIA live */}
         {error && (
-          <div className="p-4 rounded-2xl bg-red-950/60 border border-red-800 text-red-300 text-xs flex items-center justify-between gap-3 shadow-lg">
+          <div
+            role="alert"
+            aria-live="assertive"
+            className="p-4 rounded-2xl bg-red-950/60 border border-red-800 text-red-300 text-xs flex items-center justify-between gap-3 shadow-lg"
+          >
             <div className="flex items-center gap-2">
-              <AlertCircle className="w-4 h-4 text-red-400 flex-shrink-0" />
+              <AlertCircle className="w-4 h-4 text-red-400 flex-shrink-0" aria-hidden="true" />
               <span>{error}</span>
             </div>
             <button
               onClick={() => setError(null)}
-              className="text-red-400 hover:text-red-200 font-bold"
+              aria-label="Dismiss error notification"
+              className="text-red-400 hover:text-red-200 font-bold p-1 rounded focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-red-400 cursor-pointer"
             >
               ✕
             </button>
@@ -214,7 +254,7 @@ export default function Home() {
             />
 
             {isLoading && (
-              <div className="pt-4">
+              <div className="pt-4" aria-live="polite">
                 <PipelineProgress log={loadingLog} />
               </div>
             )}
@@ -225,9 +265,15 @@ export default function Home() {
         {result && (
           <div className="space-y-6 animate-fade-in">
             {/* Candidate Summary Header Bar */}
-            <div className="rounded-2xl bg-slate-900/90 border border-slate-800 p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4 shadow-xl">
+            <section
+              aria-label="Candidate Overview Banner"
+              className="rounded-2xl bg-slate-900/90 border border-slate-800 p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4 shadow-xl"
+            >
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-xl bg-indigo-600/20 text-indigo-400 flex items-center justify-center font-bold text-lg border border-indigo-500/30">
+                <div
+                  className="w-10 h-10 rounded-xl bg-indigo-600/20 text-indigo-400 flex items-center justify-center font-bold text-lg border border-indigo-500/30"
+                  aria-hidden="true"
+                >
                   ⚖️
                 </div>
                 <div>
@@ -246,90 +292,54 @@ export default function Home() {
               <div className="flex items-center gap-2">
                 <button
                   onClick={handleReset}
-                  className="px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 transition-colors"
+                  aria-label="Reset and analyze a new candidate"
+                  className="px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-400 cursor-pointer"
                 >
                   Analyze New Candidate
                 </button>
               </div>
+            </section>
+
+            {/* WAI-ARIA Accessible Navigation Tabs */}
+            <div
+              role="tablist"
+              aria-label="Evaluation Dashboard Sections"
+              className="flex border-b border-slate-800 overflow-x-auto gap-1 pb-1 scrollbar-none text-xs"
+            >
+              {tabs.map((tab, idx) => {
+                const Icon = tab.icon;
+                const isSelected = activeTab === tab.id;
+                return (
+                  <button
+                    key={tab.id}
+                    role="tab"
+                    id={`tab-${tab.id}`}
+                    aria-selected={isSelected}
+                    aria-controls={`panel-${tab.id}`}
+                    tabIndex={isSelected ? 0 : -1}
+                    onClick={() => setActiveTab(tab.id)}
+                    onKeyDown={(e) => handleTabKeyDown(e, idx)}
+                    className={`flex items-center gap-2 px-4 py-2.5 rounded-xl font-bold transition-all whitespace-nowrap focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-400 cursor-pointer ${
+                      isSelected
+                        ? "bg-indigo-600/20 text-indigo-300 border border-indigo-500/40 shadow-md"
+                        : "text-slate-400 hover:text-slate-200 hover:bg-slate-900/60"
+                    }`}
+                  >
+                    <Icon className="w-4 h-4" aria-hidden="true" />
+                    <span>{tab.label}</span>
+                  </button>
+                );
+              })}
             </div>
 
-            {/* Navigation Tabs */}
-            <div className="flex border-b border-slate-800 overflow-x-auto gap-1 pb-1 scrollbar-none text-xs">
-              <button
-                onClick={() => setActiveTab("verdict")}
-                className={`flex items-center gap-2 px-4 py-2.5 rounded-xl font-bold transition-all whitespace-nowrap ${
-                  activeTab === "verdict"
-                    ? "bg-indigo-600/20 text-indigo-300 border border-indigo-500/40 shadow-md"
-                    : "text-slate-400 hover:text-slate-200 hover:bg-slate-900/60"
-                }`}
-              >
-                <Scale className="w-4 h-4" />
-                <span>Final Verdict & Synthesis</span>
-              </button>
-
-              <button
-                onClick={() => setActiveTab("profile")}
-                className={`flex items-center gap-2 px-4 py-2.5 rounded-xl font-bold transition-all whitespace-nowrap ${
-                  activeTab === "profile"
-                    ? "bg-indigo-600/20 text-indigo-300 border border-indigo-500/40 shadow-md"
-                    : "text-slate-400 hover:text-slate-200 hover:bg-slate-900/60"
-                }`}
-              >
-                <FileSpreadsheet className="w-4 h-4" />
-                <span>Candidate Profile ({result.candidateProfile.skills.length} Skills)</span>
-              </button>
-
-              <button
-                onClick={() => setActiveTab("agents")}
-                className={`flex items-center gap-2 px-4 py-2.5 rounded-xl font-bold transition-all whitespace-nowrap ${
-                  activeTab === "agents"
-                    ? "bg-indigo-600/20 text-indigo-300 border border-indigo-500/40 shadow-md"
-                    : "text-slate-400 hover:text-slate-200 hover:bg-slate-900/60"
-                }`}
-              >
-                <Users className="w-4 h-4" />
-                <span>4 Independent Personas</span>
-              </button>
-
-              <button
-                onClick={() => setActiveTab("debate")}
-                className={`flex items-center gap-2 px-4 py-2.5 rounded-xl font-bold transition-all whitespace-nowrap ${
-                  activeTab === "debate"
-                    ? "bg-indigo-600/20 text-indigo-300 border border-indigo-500/40 shadow-md"
-                    : "text-slate-400 hover:text-slate-200 hover:bg-slate-900/60"
-                }`}
-              >
-                <MessageSquare className="w-4 h-4" />
-                <span>Debate Room ({result.debate.rounds.length} Turns)</span>
-              </button>
-
-              <button
-                onClick={() => setActiveTab("report")}
-                className={`flex items-center gap-2 px-4 py-2.5 rounded-xl font-bold transition-all whitespace-nowrap ${
-                  activeTab === "report"
-                    ? "bg-indigo-600/20 text-indigo-300 border border-indigo-500/40 shadow-md"
-                    : "text-slate-400 hover:text-slate-200 hover:bg-slate-900/60"
-                }`}
-              >
-                <FileText className="w-4 h-4" />
-                <span>Decision Packet</span>
-              </button>
-
-              <button
-                onClick={() => setActiveTab("inspector")}
-                className={`flex items-center gap-2 px-4 py-2.5 rounded-xl font-bold transition-all whitespace-nowrap ${
-                  activeTab === "inspector"
-                    ? "bg-indigo-600/20 text-indigo-300 border border-indigo-500/40 shadow-md"
-                    : "text-slate-400 hover:text-slate-200 hover:bg-slate-900/60"
-                }`}
-              >
-                <Activity className="w-4 h-4" />
-                <span>Observability Audit</span>
-              </button>
-            </div>
-
-            {/* Active Tab Content */}
-            <div className="pt-2">
+            {/* Active Tab Panel Container */}
+            <div
+              role="tabpanel"
+              id={`panel-${activeTab}`}
+              aria-labelledby={`tab-${activeTab}`}
+              tabIndex={0}
+              className="pt-2 focus:outline-none"
+            >
               {activeTab === "verdict" && (
                 <div className="space-y-6">
                   <FinalDecisionCard decision={result.finalDecision} />
@@ -371,10 +381,14 @@ export default function Home() {
       </main>
 
       {/* Footer */}
-      <footer className="border-t border-slate-900 bg-slate-950 py-6 text-center text-xs text-slate-500 mt-auto">
+      <footer
+        role="contentinfo"
+        aria-label="Site Footer"
+        className="border-t border-slate-900 bg-slate-950 py-6 text-center text-xs text-slate-500 mt-auto"
+      >
         <div className="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-2">
           <div className="flex items-center gap-1.5">
-            <Sparkles className="w-3.5 h-3.5 text-indigo-400" />
+            <Sparkles className="w-3.5 h-3.5 text-indigo-400" aria-hidden="true" />
             <span className="text-slate-400 font-medium">AI Hiring Jury</span>
             <span>— Multi-Agent Reasoning Architecture</span>
           </div>

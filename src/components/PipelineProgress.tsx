@@ -1,6 +1,6 @@
 import React from "react";
-import { CheckCircle2, CircleDashed, Users, MessageSquare, Scale, FileSpreadsheet, Sparkles } from "lucide-react";
 import { PipelineExecutionLog } from "@/types/jury";
+import { CheckCircle2, Circle, Loader2, ShieldCheck } from "lucide-react";
 
 interface PipelineProgressProps {
   log: PipelineExecutionLog;
@@ -10,125 +10,128 @@ export const PipelineProgress: React.FC<PipelineProgressProps> = ({ log }) => {
   const steps = [
     {
       id: "profile",
-      label: "Candidate Profile",
-      sublabel: "Cross-source claim mapping",
-      icon: FileSpreadsheet,
-      active: log.stage === "profile",
-      completed: ["independent_agents", "debate", "final_judge", "complete"].includes(log.stage),
-      timing: log.stageTimings.profileMs,
+      title: "Profile Builder",
+      description: "Extracting verified skills, claims & discrepancy quotes",
+      isDone: log.stage === "independent_agents" || log.stage === "debate" || log.stage === "final_judge" || log.stage === "complete",
+      isRunning: log.stage === "profile" || log.stage === "parsing" || log.stage === "idle",
+      durationMs: log.stageTimings.profileMs,
     },
     {
       id: "independent_agents",
-      label: "4 Isolated AI Personas",
-      sublabel: "Concurrent independent LLM calls",
-      icon: Users,
-      active: log.stage === "independent_agents",
-      completed: ["debate", "final_judge", "complete"].includes(log.stage),
-      timing: log.stageTimings.independentAgentsMs,
+      title: "4 Isolated Personas",
+      description: "Concurrent evaluation with 0 cross-agent context leakage",
+      isDone: log.stage === "debate" || log.stage === "final_judge" || log.stage === "complete",
+      isRunning: log.stage === "independent_agents",
+      durationMs: log.stageTimings.independentAgentsMs,
     },
     {
       id: "debate",
-      label: "Multi-Agent Debate",
-      sublabel: "Evidence challenge & revisions",
-      icon: MessageSquare,
-      active: log.stage === "debate",
-      completed: ["final_judge", "complete"].includes(log.stage),
-      timing: log.stageTimings.debateMs,
+      title: "Debate Chamber",
+      description: "Cross-examination, evidence challenges & position revisions",
+      isDone: log.stage === "final_judge" || log.stage === "complete",
+      isRunning: log.stage === "debate",
+      durationMs: log.stageTimings.debateMs,
     },
     {
       id: "final_judge",
-      label: "Final Decision Judge",
-      sublabel: "Reasoning-weighted synthesis",
-      icon: Scale,
-      active: log.stage === "final_judge",
-      completed: log.stage === "complete",
-      timing: log.stageTimings.finalJudgeMs,
+      title: "Final Decision Judge",
+      description: "Evidence-weighted verdict synthesis (Anti-Averaging rule)",
+      isDone: log.stage === "complete",
+      isRunning: log.stage === "final_judge",
+      durationMs: log.stageTimings.finalJudgeMs,
     },
   ];
 
   return (
-    <div className="w-full max-w-6xl mx-auto rounded-2xl bg-slate-900/80 border border-slate-800 p-6 space-y-5 shadow-2xl">
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-800 pb-4">
+    <section
+      role="region"
+      aria-label="Evaluation Pipeline Progress"
+      className="w-full max-w-4xl mx-auto rounded-2xl bg-slate-900/90 border border-slate-800 p-6 shadow-2xl space-y-6"
+    >
+      {/* Header */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div>
           <div className="flex items-center gap-2">
-            <Sparkles className="w-4 h-4 text-indigo-400 animate-pulse" />
-            <h3 className="text-sm font-bold text-white uppercase tracking-wider">
-              AI Jury Pipeline In Progress
+            <span className="w-2.5 h-2.5 rounded-full bg-indigo-500 animate-ping" aria-hidden="true" />
+            <h3 className="text-sm font-bold text-white tracking-wide uppercase">
+              Pipeline Execution Engine
             </h3>
           </div>
-          <p className="text-xs text-slate-400 mt-0.5">{log.currentStepDescription}</p>
+          <p className="text-xs text-slate-400 mt-1" aria-live="polite">
+            Current Stage: <span className="font-semibold text-indigo-300">{log.currentStepDescription}</span>
+          </p>
         </div>
 
-        <div className="flex items-center gap-3">
-          <div className="text-right">
-            <span className="text-xs font-bold text-indigo-400">{log.progressPercentage}%</span>
-            <p className="text-[10px] text-slate-500">
-              {log.providerUsed}
-            </p>
-          </div>
-          <div className="w-24 bg-slate-800 rounded-full h-2 overflow-hidden">
-            <div
-              className="bg-gradient-to-r from-blue-500 to-indigo-500 h-2 rounded-full transition-all duration-500"
-              style={{ width: `${log.progressPercentage}%` }}
-            />
-          </div>
+        <div className="flex items-center gap-2 text-xs font-mono text-slate-400">
+          <ShieldCheck className="w-4 h-4 text-indigo-400" aria-hidden="true" />
+          <span>Strict Isolation Guaranteed</span>
         </div>
       </div>
 
-      {/* Steps Visualizer */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
-        {steps.map((step, idx) => {
-          const Icon = step.icon;
-          return (
-            <div
-              key={step.id}
-              className={`p-3.5 rounded-xl border transition-all ${
-                step.active
-                  ? "bg-indigo-950/40 border-indigo-500/60 shadow-lg shadow-indigo-500/10 ring-1 ring-indigo-500/30"
-                  : step.completed
-                  ? "bg-slate-950/60 border-emerald-500/30"
-                  : "bg-slate-950/20 border-slate-800/60 opacity-60"
-              }`}
-            >
-              <div className="flex items-start justify-between">
-                <div className="flex items-center gap-2">
-                  <div
-                    className={`w-7 h-7 rounded-lg flex items-center justify-center text-xs font-bold ${
-                      step.completed
-                        ? "bg-emerald-500/20 text-emerald-400"
-                        : step.active
-                        ? "bg-indigo-500/20 text-indigo-300 animate-pulse"
-                        : "bg-slate-800 text-slate-400"
-                    }`}
-                  >
-                    <Icon className="w-3.5 h-3.5" />
-                  </div>
-                  <div>
-                    <div className="text-xs font-bold text-slate-200">{step.label}</div>
-                    <div className="text-[10px] text-slate-400">{step.sublabel}</div>
-                  </div>
-                </div>
+      {/* Progress Bar */}
+      <div className="space-y-1.5">
+        <div className="flex justify-between text-xs text-slate-400">
+          <span>Overall Progress</span>
+          <span className="font-semibold text-slate-200">{log.progressPercentage}%</span>
+        </div>
+        <div
+          role="progressbar"
+          aria-valuenow={log.progressPercentage}
+          aria-valuemin={0}
+          aria-valuemax={100}
+          aria-label="Jury evaluation progress"
+          className="w-full h-2.5 rounded-full bg-slate-950 overflow-hidden border border-slate-800"
+        >
+          <div
+            className="h-full bg-gradient-to-r from-blue-500 via-indigo-500 to-purple-500 rounded-full transition-all duration-500 ease-out"
+            style={{ width: `${log.progressPercentage}%` }}
+          />
+        </div>
+      </div>
 
-                <div>
-                  {step.completed ? (
-                    <CheckCircle2 className="w-4 h-4 text-emerald-400" />
-                  ) : step.active ? (
-                    <CircleDashed className="w-4 h-4 text-indigo-400 animate-spin" />
-                  ) : (
-                    <span className="text-[10px] text-slate-600 font-mono">0{idx + 1}</span>
-                  )}
-                </div>
-              </div>
-
-              {step.timing !== undefined && (
-                <div className="mt-2 text-[10px] font-mono text-emerald-400/80 text-right">
-                  {(step.timing / 1000).toFixed(2)}s
-                </div>
-              )}
+      {/* Step Grid */}
+      <div
+        className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3 pt-2"
+        role="list"
+        aria-label="Pipeline execution steps"
+      >
+        {steps.map((step, idx) => (
+          <div
+            key={step.id}
+            role="listitem"
+            aria-label={`Stage ${idx + 1}: ${step.title} (${step.isDone ? "completed" : step.isRunning ? "running" : "pending"})`}
+            className={`p-3.5 rounded-xl border transition-all flex flex-col justify-between space-y-2 ${
+              step.isRunning
+                ? "bg-indigo-950/40 border-indigo-500/60 shadow-lg shadow-indigo-950/40"
+                : step.isDone
+                ? "bg-slate-950/70 border-emerald-500/30"
+                : "bg-slate-950/30 border-slate-800/60 opacity-60"
+            }`}
+          >
+            <div className="flex items-center justify-between">
+              <span className="text-[10px] font-mono uppercase font-bold text-slate-500">
+                Stage 0{idx + 1}
+              </span>
+              {step.isDone && <CheckCircle2 className="w-4 h-4 text-emerald-400" aria-hidden="true" />}
+              {step.isRunning && <Loader2 className="w-4 h-4 text-indigo-400 animate-spin" aria-hidden="true" />}
+              {!step.isDone && !step.isRunning && <Circle className="w-4 h-4 text-slate-700" aria-hidden="true" />}
             </div>
-          );
-        })}
+
+            <div>
+              <p className="text-xs font-bold text-slate-200 leading-tight">{step.title}</p>
+              <p className="text-[11px] text-slate-400 mt-0.5 line-clamp-2 leading-relaxed">
+                {step.description}
+              </p>
+            </div>
+
+            {step.durationMs ? (
+              <span className="text-[10px] font-mono text-slate-500">
+                {step.durationMs}ms
+              </span>
+            ) : null}
+          </div>
+        ))}
       </div>
-    </div>
+    </section>
   );
 };
